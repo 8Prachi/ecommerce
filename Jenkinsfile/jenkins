@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    tools {
+        maven "Maven"    // Must match Jenkins Maven installation name
+        nodejs "NodeJS"  // Must match Jenkins NodeJS installation name
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/8Prachi/ecommerce.git'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                dir('ecommerce-backend') {
+                    sh 'mvn clean install'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir('ecommerce-frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build completed successfully!'
+        }
+        failure {
+            echo '❌ Build failed. Check logs.'
+        }
+    }
+}
